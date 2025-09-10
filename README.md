@@ -4,14 +4,39 @@ Go Woof has helper functions for godog tests.
 
 ## ⬇️ Installation
 
-`go get github.com/survivorbat/go-gowoof`
+`go get github.com/survivorbat/go-woof`
 
 ## 📋 Usage
 
-```go
-```
+### `ParseTable`
 
-## ⚙️ Configuration
+```go
+package tests
+
+import (
+	"github.com/cucumber/godog"
+	"github.com/stretchr/testify/require"
+)
+
+type Dog struct {
+  Name string
+}
+
+type scenario struct {
+  Dogs []Dog
+}
+
+func (s *scenario) theFollowingDogsAreInTheSystem(ctx context.Context, dogTable *godog.Table) error {
+  t := godog.T(ctx)
+  
+  dogs, err := gowoof.ParseTable[Dog](dogTable)
+  require.NoError(t, err)
+
+  s.Dogs = dogs
+
+  return nil
+}
+```
 
 ## 🔭 Plans
 
