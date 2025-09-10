@@ -11,7 +11,7 @@ type Config struct {
 type Option func(*Config) error
 
 // WithDecodeConfig allows you to set a custom DecoderConfig that will be used when decoding to a
-// struct. The `Result` property is overriden during parsing. `WeaklyTypedInput` is enabled by default.
+// struct. The `Result` property is overridden during parsing. `WeaklyTypedInput` is enabled by default.
 func WithDecodeConfig(cfg *mapstructure.DecoderConfig) Option {
 	return func(c *Config) error {
 		c.DecodeConfig = cfg
