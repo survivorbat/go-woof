@@ -8,7 +8,7 @@ import (
 	"github.com/cucumber/godog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/survivorbat/go-gowoof"
+	gowoof "github.com/survivorbat/go-woof"
 )
 
 type Dog struct {

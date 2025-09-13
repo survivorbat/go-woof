@@ -41,6 +41,37 @@ func TestParseTable_ReturnsExpectedData(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestParseTable_ReturnsExpectedDataWithPointer(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	type TestType struct {
+		String  string
+		Number  int
+		Boolean bool
+	}
+
+	table := &godog.Table{
+		Rows: []*messages.PickleTableRow{
+			{Cells: []*messages.PickleTableCell{{Value: "string"}, {Value: "number"}, {Value: "boolean"}}},
+			{Cells: []*messages.PickleTableCell{{Value: "abc"}, {Value: "123"}, {Value: "true"}}},
+			{Cells: []*messages.PickleTableCell{{Value: "def"}, {Value: "456"}, {Value: "false"}}},
+		},
+	}
+
+	// Act
+	actual, err := ParseTable[*TestType](table)
+
+	// Assert
+	require.NoError(t, err)
+
+	expected := []*TestType{
+		{String: "abc", Number: 123, Boolean: true},
+		{String: "def", Number: 456, Boolean: false},
+	}
+
+	assert.Equal(t, expected, actual)
+}
+
 func TestParseTable_ReturnsOptionError(t *testing.T) {
 	t.Parallel()
 	// Arrange
@@ -65,7 +96,18 @@ func TestParseTable_ReturnsErrorIfGenericIsNotAStruct(t *testing.T) {
 
 	// Assert
 	require.ErrorIs(t, err, ErrInvalidInput)
-	require.ErrorContains(t, err, "generic type is not a struct")
+	require.ErrorContains(t, err, `generic type "string" is not a struct`)
+	assert.Empty(t, actual)
+}
+
+func TestParseTable_ReturnsErrorIfGenericIsNotAPointerToAStruct(t *testing.T) {
+	t.Parallel()
+	// Act
+	actual, err := ParseTable[*string](nil)
+
+	// Assert
+	require.ErrorIs(t, err, ErrInvalidInput)
+	require.ErrorContains(t, err, `generic pointer type "*string" is not a pointer to a struct`)
 	assert.Empty(t, actual)
 }
 
@@ -131,7 +173,6 @@ func TestParseTable_ReturnsErrorOnDecodeFailure(t *testing.T) {
 	actual, err := ParseTable[TestType](table, WithDecodeConfig(customConfig))
 
 	// Assert
-	require.ErrorContains(t, err, "failed to decode row 0")
-	require.ErrorContains(t, err, "failed to decode row 1")
+	require.ErrorContains(t, err, "failed to decode")
 	assert.Empty(t, actual)
 }

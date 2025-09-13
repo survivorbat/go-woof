@@ -1,4 +1,4 @@
-module github.com/survivorbat/go-gowoof
+module github.com/survivorbat/go-woof
 
 go 1.25.0
 

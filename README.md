@@ -10,11 +10,14 @@ Go Woof has helper functions for godog tests.
 
 ### `ParseTable`
 
+Parse a table to a struct using `mapstructure`.
+
 ```go
 package tests
 
 import (
 	"github.com/cucumber/godog"
+	"github.com/survivorbat/go-woof"
 	"github.com/stretchr/testify/require"
 )
 
