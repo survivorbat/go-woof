@@ -47,21 +47,15 @@ func ParseTable[T any](table *godog.Table, opts ...Option) ([]T, error) {
 		return nil, fmt.Errorf("no cells to parse: %w", ErrInvalidInput)
 	}
 
-	// Get all the fields/headers
-	headers := lo.Map(table.Rows[0].Cells, func(item *messages.PickleTableCell, _ int) string {
-		return item.Value
-	})
+	var mapList []map[string]string
+
+	if cfg.Vertical {
+		mapList = parseVertically(table.Rows)
+	} else {
+		mapList = parseHorizontally(table.Rows)
+	}
 
 	var result []T
-
-	mapList := lo.Map(table.Rows[1:], func(row *messages.PickleTableRow, rowIndex int) map[string]string {
-		// Not using SliceToMap because the callback lacks the index parameter
-		entries := lo.Map(row.Cells, func(item *messages.PickleTableCell, cellIndex int) lo.Entry[string, string] {
-			return lo.Entry[string, string]{Key: headers[cellIndex], Value: item.Value}
-		})
-
-		return lo.FromEntries(entries)
-	})
 
 	// Required for the function to work
 	cfg.DecodeConfig.Result = &result
@@ -78,4 +72,41 @@ func ParseTable[T any](table *godog.Table, opts ...Option) ([]T, error) {
 	}
 
 	return result, nil
+}
+
+func parseHorizontally(rows []*messages.PickleTableRow) []map[string]string {
+	headers := lo.Map(rows[0].Cells, func(cell *messages.PickleTableCell, _ int) string {
+		return cell.Value
+	})
+
+	mapList := lo.Map(rows[1:], func(row *messages.PickleTableRow, _ int) map[string]string {
+		// Not using SliceToMap because the callback lacks the index parameter
+		entries := lo.Map(row.Cells, func(item *messages.PickleTableCell, cellIndex int) lo.Entry[string, string] {
+			return lo.Entry[string, string]{Key: headers[cellIndex], Value: item.Value}
+		})
+
+		return lo.FromEntries(entries)
+	})
+
+	return mapList
+}
+
+func parseVertically(rows []*messages.PickleTableRow) []map[string]string {
+	headers := lo.Map(rows, func(row *messages.PickleTableRow, _ int) string {
+		return row.Cells[0].Value
+	})
+
+	result := make([]map[string]string, len(rows[0].Cells[1:]))
+
+	for rowIndex, row := range rows {
+		for cellIndex, cell := range row.Cells[1:] {
+			if result[cellIndex] == nil {
+				result[cellIndex] = make(map[string]string, len(rows))
+			}
+
+			result[cellIndex][headers[rowIndex]] = cell.Value
+		}
+	}
+
+	return result
 }

@@ -3,6 +3,7 @@ package integrationtests
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"testing"
 
 	"github.com/cucumber/godog"
@@ -38,6 +39,17 @@ func (s *scenario) iUseTheFromTableFunctionWithTheTable(ctx context.Context, inp
 	return nil
 }
 
+func (s *scenario) iUseTheFromTableFunctionWithTheTableVertically(ctx context.Context, input *godog.Table) error {
+	t := godog.T(ctx)
+
+	actual, err := gowoof.ParseTable[Dog](input, gowoof.Vertical())
+	require.NoError(t, err)
+
+	s.Actual = actual
+
+	return nil
+}
+
 func (s *scenario) iExpectASliceThatResemblesTheFollowingJSON(ctx context.Context, input *godog.DocString) error {
 	t := godog.T(ctx)
 
@@ -57,6 +69,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^I expect a slice that resembles the following JSON:$`, scenario.iExpectASliceThatResemblesTheFollowingJSON)
 	ctx.Step(`^I have a struct type that looks like the following structure:$`, scenario.iHaveAStructTypeThatLooksLikeTheFollowingStructure)
 	ctx.Step(`^I use the FromTable function with the table:$`, scenario.iUseTheFromTableFunctionWithTheTable)
+	ctx.Step(`^I use the FromTable function with the table vertically:$`, scenario.iUseTheFromTableFunctionWithTheTableVertically)
 }
 
 func TestFeatures(t *testing.T) {
@@ -65,9 +78,8 @@ func TestFeatures(t *testing.T) {
 	suite := godog.TestSuite{
 		ScenarioInitializer: InitializeScenario,
 		Options: &godog.Options{
-			Format:   "pretty",
-			Paths:    []string{"features"},
-			TestingT: t, // Testing instance that will run subtests.
+			Format: "pretty",
+			Paths:  flag.Args(),
 		},
 	}
 

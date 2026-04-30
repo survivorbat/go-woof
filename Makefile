@@ -8,16 +8,13 @@ help:
 
 fmt: ## Format go code, tidy the go.mod file and run the linter
 	@go mod tidy
-	@gofumpt -l -w .
-	@golangci-lint run --fix
-
-tools: ## Install extra tools for development
-	go install mvdan.cc/gofumpt@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	@go tool golangci-lint fmt
+	@go tool ghokin fmt replace ./integration-tests
+	@go tool golangci-lint run --fix
 
 lint: ## Lint the code locally
-	golangci-lint run
+	@golangci-lint run
 
 test: ## Run unit-tests
-	go test ./... -timeout=20s -parallel=20
+	go test ./...
 

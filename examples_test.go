@@ -18,6 +18,14 @@ func godogTable() *godog.Table {
 	}
 }
 
+func verticalGodogTable() *godog.Table {
+	return &godog.Table{
+		Rows: []*messages.PickleTableRow{
+			{Cells: []*messages.PickleTableCell{{Value: "name"}, {Value: "Rex"}, {Value: "Lando"}, {Value: "Bob"}}},
+		},
+	}
+}
+
 func ExampleParseTable() {
 	type Dog struct {
 		Name string
@@ -26,6 +34,24 @@ func ExampleParseTable() {
 	table := godogTable()
 
 	dogs, err := ParseTable[Dog](table)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(dogs)
+
+	// Output:
+	// [{Rex} {Lando} {Bob}]
+}
+
+func ExampleParseTable_vertically() {
+	type Dog struct {
+		Name string
+	}
+
+	table := verticalGodogTable()
+
+	dogs, err := ParseTable[Dog](table, Vertical())
 	if err != nil {
 		panic(err)
 	}

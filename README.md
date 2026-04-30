@@ -16,9 +16,9 @@ Parse a table to a struct using `mapstructure`.
 package tests
 
 import (
-	"github.com/cucumber/godog"
-	"github.com/survivorbat/go-woof"
-	"github.com/stretchr/testify/require"
+  "github.com/cucumber/godog"
+  "github.com/survivorbat/go-woof"
+  "github.com/stretchr/testify/require"
 )
 
 type Dog struct {
@@ -31,7 +31,7 @@ type scenario struct {
 
 func (s *scenario) theFollowingDogsAreInTheSystem(ctx context.Context, dogTable *godog.Table) error {
   t := godog.T(ctx)
-  
+
   dogs, err := gowoof.ParseTable[Dog](dogTable)
   require.NoError(t, err)
 
@@ -40,6 +40,8 @@ func (s *scenario) theFollowingDogsAreInTheSystem(ctx context.Context, dogTable 
   return nil
 }
 ```
+
+With the `gowoof.Vertical()` option the function can be instructed to read the table vertically.
 
 ## 🔭 Plans
 

@@ -29,6 +29,8 @@ linters:
       enable-all: true
     nlreturn:
       block-size: 3
+    cyclop:
+      max-complexity: 15
   exclusions:
     generated: lax
     presets:
