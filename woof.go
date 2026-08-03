@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/cucumber/godog"
-	messages "github.com/cucumber/messages/go/v21"
+	messages "github.com/cucumber/messages/go/v34"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/samber/lo"
 )
