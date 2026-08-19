@@ -8,7 +8,6 @@ import (
 	"github.com/cucumber/godog"
 	messages "github.com/cucumber/messages/go/v34"
 	"github.com/go-viper/mapstructure/v2"
-	"github.com/samber/lo"
 )
 
 // ErrInvalidInput is returned if an invalid input is encountered
@@ -18,8 +17,10 @@ var ErrInvalidInput = errors.New("invalid input")
 // underneath to map the table fields to the output slice.
 func ParseTable[T any](table *godog.Table, opts ...Option) ([]T, error) {
 	cfg := &Config{
+		NullValue: "NULL",
 		DecodeConfig: &mapstructure.DecoderConfig{
 			WeaklyTypedInput: true,
+			Squash:           true,
 		},
 	}
 
@@ -50,9 +51,9 @@ func ParseTable[T any](table *godog.Table, opts ...Option) ([]T, error) {
 	var mapList []map[string]string
 
 	if cfg.Vertical {
-		mapList = parseVertically(table.Rows)
+		mapList = parseVertically(cfg, table.Rows)
 	} else {
-		mapList = parseHorizontally(table.Rows)
+		mapList = parseHorizontally(cfg, table.Rows)
 	}
 
 	var result []T
@@ -74,39 +75,52 @@ func ParseTable[T any](table *godog.Table, opts ...Option) ([]T, error) {
 	return result, nil
 }
 
-func parseHorizontally(rows []*messages.PickleTableRow) []map[string]string {
-	headers := lo.Map(rows[0].Cells, func(cell *messages.PickleTableCell, _ int) string {
-		return cell.Value
-	})
+// parseHorizontally takes the first row as a list of headers, and every row after that as entries
+func parseHorizontally(cfg *Config, rows []*messages.PickleTableRow) []map[string]string {
+	headers := make([]string, len(rows[0].Cells))
+	for index, cell := range rows[0].Cells {
+		headers[index] = cell.Value
+	}
 
-	mapList := lo.Map(rows[1:], func(row *messages.PickleTableRow, _ int) map[string]string {
-		// Not using SliceToMap because the callback lacks the index parameter
-		entries := lo.Map(row.Cells, func(item *messages.PickleTableCell, cellIndex int) lo.Entry[string, string] {
-			return lo.Entry[string, string]{Key: headers[cellIndex], Value: item.Value}
-		})
+	output := make([]map[string]string, len(rows[1:]))
 
-		return lo.FromEntries(entries)
-	})
+	for rowIndex, row := range rows[1:] {
+		output[rowIndex] = make(map[string]string, len(rows[0].Cells))
 
-	return mapList
-}
-
-func parseVertically(rows []*messages.PickleTableRow) []map[string]string {
-	headers := lo.Map(rows, func(row *messages.PickleTableRow, _ int) string {
-		return row.Cells[0].Value
-	})
-
-	result := make([]map[string]string, len(rows[0].Cells[1:]))
-
-	for rowIndex, row := range rows {
-		for cellIndex, cell := range row.Cells[1:] {
-			if result[cellIndex] == nil {
-				result[cellIndex] = make(map[string]string, len(rows))
+		for cellIndex, cell := range row.Cells {
+			if cell.Value == cfg.NullValue {
+				continue
 			}
 
-			result[cellIndex][headers[rowIndex]] = cell.Value
+			output[rowIndex][headers[cellIndex]] = cell.Value
 		}
 	}
 
-	return result
+	return output
+}
+
+// parseVertically takes the first column as a list of headers, and every column after that as entries
+func parseVertically(cfg *Config, rows []*messages.PickleTableRow) []map[string]string {
+	headers := make([]string, len(rows[0].Cells))
+	for index, row := range rows {
+		headers[index] = row.Cells[0].Value
+	}
+
+	output := make([]map[string]string, len(rows[0].Cells[1:]))
+
+	for rowIndex, row := range rows {
+		for cellIndex, cell := range row.Cells[1:] {
+			if cell.Value == cfg.NullValue {
+				continue
+			}
+
+			if output[cellIndex] == nil {
+				output[cellIndex] = make(map[string]string, len(rows))
+			}
+
+			output[cellIndex][headers[rowIndex]] = cell.Value
+		}
+	}
+
+	return output
 }

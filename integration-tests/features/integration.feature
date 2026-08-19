@@ -12,15 +12,15 @@ Feature: Parsing a table is a 🍰
       """
 
     When I use the FromTable function with the table:
-      | name | age | type          | vaccinated |
-      | Dex  | 5   | Dachshund     | true       |
-      | Bob  | 1   | Berner Sennen | false      |
+      | name | age | type          | vaccinated | nickname |
+      | Dex  | 5   | Dachshund     | true       | Dexy     |
+      | Bob  | 1   | Berner Sennen | false      | NULL     |
 
     Then I expect a slice that resembles the following JSON:
       """
       [
-        {"name": "Dex", "age": 5, "type": "Dachshund", "vaccinated": true},
-        {"name": "Bob", "age": 1, "type": "Berner Sennen", "vaccinated": false}
+        {"name": "Dex", "age": 5, "type": "Dachshund", "vaccinated": true, "nickname": "Dexy"},
+        {"name": "Bob", "age": 1, "type": "Berner Sennen", "vaccinated": false, "nickname": null}
       ]
       """
 
@@ -39,11 +39,12 @@ Feature: Parsing a table is a 🍰
       | age        | 5         | 1             |
       | type       | Dachshund | Berner Sennen |
       | vaccinated | true      | false         |
+      | nickname   | NULL      | Bobby         |
 
     Then I expect a slice that resembles the following JSON:
       """
       [
-        {"name": "Dex", "age": 5, "type": "Dachshund", "vaccinated": true},
-        {"name": "Bob", "age": 1, "type": "Berner Sennen", "vaccinated": false}
+        {"name": "Dex", "age": 5, "type": "Dachshund", "vaccinated": true, "nickname": null},
+        {"name": "Bob", "age": 1, "type": "Berner Sennen", "vaccinated": false, "nickname": "Bobby"}
       ]
       """

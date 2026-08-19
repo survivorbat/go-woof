@@ -13,10 +13,11 @@ import (
 )
 
 type Dog struct {
-	Name       string `json:"name"`
-	Age        int    `json:"age"`
-	Type       string `json:"type"`
-	Vaccinated bool   `json:"Vaccinated"`
+	Name       string  `json:"name"`
+	Age        int     `json:"age"`
+	Type       string  `json:"type"`
+	Vaccinated bool    `json:"Vaccinated"`
+	Nickname   *string `json:"nickName"`
 }
 
 type scenario struct {

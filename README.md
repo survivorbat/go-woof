@@ -41,7 +41,10 @@ func (s *scenario) theFollowingDogsAreInTheSystem(ctx context.Context, dogTable 
 }
 ```
 
-With the `gowoof.Vertical()` option the function can be instructed to read the table vertically.
+#### Options
+
+- `gowoof.Vertical()` will cause the table to be read vertically (first column as labels)
+- `gowoof.WithNullValue("...")` will set the string used to indicate that a cell should be skipped, defaults to `NULL`
 
 ## 🔭 Plans
 

@@ -4,8 +4,20 @@ import "github.com/go-viper/mapstructure/v2"
 
 // Config is used internally
 type Config struct {
+	// DecodeConfig is used when running mapstructure against the struct inputs
 	DecodeConfig *mapstructure.DecoderConfig
-	Vertical     bool
+
+	// Vertical determines parsing direction
+	Vertical bool
+
+	// NullValue indicates a string that marks a cell as unset, for example:
+	//
+	// | ID | Name | Job |
+	// | 1  | Foo | Dev  |
+	// | 2  | Bar | NULL |
+	//
+	// Defaults to "NULL"
+	NullValue string
 }
 
 // Option is used to implement the Functional Option pattern in ParseTable.
@@ -37,6 +49,20 @@ func WithDecodeConfig(cfg *mapstructure.DecoderConfig) Option {
 func Vertical() Option {
 	return func(c *Config) error {
 		c.Vertical = true
+		return nil
+	}
+}
+
+// WithNullValue indicates a value that marks a cell as unset or nil, for example:
+//
+// | ID | Name | Job |
+// | 1  | Foo | Dev  |
+// | 2  | Bar | NULL |
+//
+// Defaults to NULL
+func WithNullValue(value string) Option {
+	return func(c *Config) error {
+		c.NullValue = value
 		return nil
 	}
 }

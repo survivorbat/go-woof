@@ -72,6 +72,39 @@ func TestParseTable_ReturnsExpectedDataVertically(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestParseTable_ReturnsExpectedDataWithNullValues(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	type TestType struct {
+		String  *string
+		Number  *int
+		Boolean *bool
+	}
+
+	table := &godog.Table{
+		Rows: []*messages.PickleTableRow{
+			{Cells: []*messages.PickleTableCell{{Value: "string"}, {Value: "number"}, {Value: "boolean"}}},
+			{Cells: []*messages.PickleTableCell{{Value: "NULL"}, {Value: "123"}, {Value: "true"}}},
+			{Cells: []*messages.PickleTableCell{{Value: "def"}, {Value: "NULL"}, {Value: "false"}}},
+			{Cells: []*messages.PickleTableCell{{Value: "ghi"}, {Value: "456"}, {Value: "NULL"}}},
+		},
+	}
+
+	// Act
+	actual, err := ParseTable[TestType](table)
+
+	// Assert
+	require.NoError(t, err)
+
+	expected := []TestType{
+		{String: nil, Number: new(123), Boolean: new(true)},
+		{String: new("def"), Number: nil, Boolean: new(false)},
+		{String: new("ghi"), Number: new(456), Boolean: nil},
+	}
+
+	assert.Equal(t, expected, actual)
+}
+
 func TestParseTable_ReturnsExpectedDataWithPointer(t *testing.T) {
 	t.Parallel()
 	// Arrange

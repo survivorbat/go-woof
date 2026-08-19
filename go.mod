@@ -6,7 +6,6 @@ require (
 	github.com/cucumber/godog v0.16.0
 	github.com/cucumber/messages/go/v34 v34.2.0
 	github.com/go-viper/mapstructure/v2 v2.5.0
-	github.com/samber/lo v1.53.0
 	github.com/stretchr/testify v1.11.1
 )
 
