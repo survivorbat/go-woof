@@ -8,7 +8,7 @@ Go Woof has helper functions for godog tests.
 
 ## 📋 Usage
 
-### `ParseTable`
+### ParseTable
 
 Parse a table to a struct using `mapstructure`.
 
@@ -45,6 +45,22 @@ func (s *scenario) theFollowingDogsAreInTheSystem(ctx context.Context, dogTable 
 
 - `gowoof.Vertical()` will cause the table to be read vertically (first column as labels)
 - `gowoof.WithNullValue("...")` will set the string used to indicate that a cell should be skipped, defaults to `NULL`
+
+### TableString
+
+Stringify a godog table into a gherkin-like format.
+
+```go
+fmt.Println(gowoof.TableString(godogTable))
+```
+
+### RowString
+
+Stringify a godog row into a gherkin-like format.
+
+```go
+fmt.Println(gowoof.RowString(godogRow))
+```
 
 ## 🔭 Plans
 

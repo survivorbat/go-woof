@@ -240,3 +240,42 @@ func TestParseTable_ReturnsErrorOnDecodeFailure(t *testing.T) {
 	require.ErrorContains(t, err, "failed to decode")
 	assert.Empty(t, actual)
 }
+
+func TestTableString_OutputsExpectedTable(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	table := &godog.Table{
+		Rows: []*messages.PickleTableRow{
+			{Cells: []*messages.PickleTableCell{{Value: "string"}, {Value: "number"}, {Value: "boolean"}}},
+			{Cells: []*messages.PickleTableCell{{Value: "abc"}, {Value: "123"}, {Value: "true"}}},
+			{Cells: []*messages.PickleTableCell{{Value: "def"}, {Value: "123456789"}, {Value: "false"}}},
+		},
+	}
+
+	// Act
+	actual := TableString(table)
+
+	// Assert
+	expected := `
+| string | number    | boolean |
+| abc    | 123       | true    |
+| def    | 123456789 | false   |`[1:]
+
+	assert.Equal(t, expected, actual)
+}
+
+func TestRowString_OutputsExpectedRow(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	row := &messages.PickleTableRow{
+		Cells: []*messages.PickleTableCell{{Value: "def"}, {Value: "123456789"}, {Value: "false"}},
+	}
+
+	// Act
+	actual := RowString(row)
+
+	// Assert
+	expected := `| def | 123456789 | false |`
+
+	assert.Equal(t, expected, actual)
+}

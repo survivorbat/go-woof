@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/cucumber/godog"
 	messages "github.com/cucumber/messages/go/v34"
@@ -123,4 +124,42 @@ func parseVertically(cfg *Config, rows []*messages.PickleTableRow) []map[string]
 	}
 
 	return output
+}
+
+// TableString turns the table into a gherkin-like representation for output purposes
+func TableString(table *godog.Table) string {
+	columnWidths := make(map[int]int, len(table.Rows[0].Cells))
+
+	for _, row := range table.Rows {
+		for index, cell := range row.Cells {
+			if columnWidths[index] < len(cell.Value) {
+				columnWidths[index] = len(cell.Value)
+			}
+		}
+	}
+
+	var builder strings.Builder
+	for rowIndex, row := range table.Rows {
+		_, _ = builder.WriteRune('|')
+
+		for cellIndex, cell := range row.Cells {
+			_, _ = fmt.Fprintf(&builder, " %-*s |", columnWidths[cellIndex], cell.Value)
+		}
+
+		if rowIndex < len(table.Rows)-1 {
+			_, _ = builder.WriteRune('\n')
+		}
+	}
+
+	return builder.String()
+}
+
+// RowString turns the row into a gherkin-like representation for output purposes
+func RowString(row *messages.PickleTableRow) string {
+	values := make([]string, len(row.Cells))
+	for index, cell := range row.Cells {
+		values[index] = cell.Value
+	}
+
+	return "| " + strings.Join(values, " | ") + " |"
 }
