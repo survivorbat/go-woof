@@ -161,5 +161,8 @@ func RowString(row *messages.PickleTableRow) string {
 		values[index] = cell.Value
 	}
 
-	return "| " + strings.Join(values, " | ") + " |"
+	output := "| " + strings.Join(values, " | ") + " |"
+
+	// Ensure empty cells are 1 space wide
+	return strings.ReplaceAll(output, "  ", " ")
 }

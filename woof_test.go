@@ -268,14 +268,14 @@ func TestRowString_OutputsExpectedRow(t *testing.T) {
 	t.Parallel()
 	// Arrange
 	row := &messages.PickleTableRow{
-		Cells: []*messages.PickleTableCell{{Value: "def"}, {Value: "123456789"}, {Value: "false"}},
+		Cells: []*messages.PickleTableCell{{}, {Value: "def"}, {}, {Value: "123456789"}, {Value: "false"}, {}},
 	}
 
 	// Act
 	actual := RowString(row)
 
 	// Assert
-	expected := `| def | 123456789 | false |`
+	expected := `| | def | | 123456789 | false | |`
 
 	assert.Equal(t, expected, actual)
 }
