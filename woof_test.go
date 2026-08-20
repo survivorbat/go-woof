@@ -248,6 +248,7 @@ func TestTableString_OutputsExpectedTable(t *testing.T) {
 		Rows: []*messages.PickleTableRow{
 			{Cells: []*messages.PickleTableCell{{Value: "string"}, {Value: "number"}, {Value: "boolean"}}},
 			{Cells: []*messages.PickleTableCell{{Value: "abc"}, {Value: "123"}, {Value: "true"}}},
+			{Cells: []*messages.PickleTableCell{{Value: ""}, {Value: ""}, {Value: ""}}},
 			{Cells: []*messages.PickleTableCell{{Value: "def"}, {Value: "123456789"}, {Value: "false"}}},
 		},
 	}
@@ -259,6 +260,7 @@ func TestTableString_OutputsExpectedTable(t *testing.T) {
 	expected := `
 | string | number    | boolean |
 | abc    | 123       | true    |
+|        |           |         |
 | def    | 123456789 | false   |`[1:]
 
 	assert.Equal(t, expected, actual)
